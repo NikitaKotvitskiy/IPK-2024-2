@@ -1,13 +1,14 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 namespace ipk24chat_server.inner
 {
     public static class Cla
     {
-        public static IPAddress ListeningIp { get; private set; } = IPAddress.Parse("0.0.0.0");
-        public static ushort ListeningPort { get; private set; } = 4567;
-        public static ushort UdpTimeout { get; private set; } = 250;
-        public static byte UdpMaxRetransmissions { get; private set; } = 3;
+        public static IPAddress ListeningIp { get; private set; } = null!;
+        public static ushort ListeningPort { get; private set; }
+        public static ushort UdpTimeout { get; private set; }
+        public static byte UdpMaxRetransmissions { get; private set; }
 
         public const string HelpMessage = "The following command line arguments set is acceptable:\n" +
                                             "\t-l [IP] - sets server listening IP address for welcome sockets (0.0.0.0 by default)\n" +
@@ -18,10 +19,12 @@ namespace ipk24chat_server.inner
 
         public static bool ProcessCla(string[] args)
         {
+            ToDefault();
+
             var argIndex = 0;
             var currentArg = GetNext();
 
-            while (currentArg != null)
+            while (!String.IsNullOrEmpty(currentArg))
             {
                 switch (currentArg)
                 {
@@ -60,6 +63,14 @@ namespace ipk24chat_server.inner
             return true;
 
             string? GetNext() => argIndex < args.Length ? args[argIndex++] : null;
+        }
+
+        private static void ToDefault()
+        {
+            ListeningIp = IPAddress.Parse("0.0.0.0");
+            ListeningPort = 4567;
+            UdpTimeout = 250;
+            UdpMaxRetransmissions = 3;
         }
     }
 }
