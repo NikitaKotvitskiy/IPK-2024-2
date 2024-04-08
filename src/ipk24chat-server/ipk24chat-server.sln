@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ipk24chat-server", "ipk24chat-server.csproj", "{4311C344-11A9-4019-91CE-FE5A836B20E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ipk24chat-server.Tests", "..\ipk24chat-server.Tests\ipk24chat-server.Tests.csproj", "{FDA1FCB3-AD87-4FC9-9C70-0448F68C0FC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{4311C344-11A9-4019-91CE-FE5A836B20E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4311C344-11A9-4019-91CE-FE5A836B20E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4311C344-11A9-4019-91CE-FE5A836B20E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDA1FCB3-AD87-4FC9-9C70-0448F68C0FC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDA1FCB3-AD87-4FC9-9C70-0448F68C0FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDA1FCB3-AD87-4FC9-9C70-0448F68C0FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDA1FCB3-AD87-4FC9-9C70-0448F68C0FC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
