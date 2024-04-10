@@ -159,5 +159,54 @@ namespace ipk24chat_server.messages
             fields.Secret = secretString;
             Fields = fields;
         }
+
+        public static MessageType DefineTypeOfMessage(byte[] data, ProtocolType protocol)
+        {
+            if (protocol == ProtocolType.UDP)
+            {
+                var typeByte = (byte)data[0];
+                switch (typeByte)
+                {
+                    case 0x00:
+                        return MessageType.CONFIRM;
+                    case 0x01:
+                        return MessageType.REPLY;
+                    case 0x02:
+                        return MessageType.AUTH;
+                    case 0x03:
+                        return MessageType.JOIN;
+                    case 0x04:
+                        return MessageType.MSG;
+                    case 0xFE:
+                        return MessageType.ERR;
+                    case 0xFF:
+                        return MessageType.BYE;
+                    default:
+                        throw new ProtocolException("Invalid UDP message type detected", "[0x00-0x04 | 0xFE-0xFF]", $"0x{typeByte:X2}");
+                }
+            }
+            else
+            {
+                var messageString = Encoding.ASCII.GetString(data);
+                var typeWord = messageString.Split(' ')[0];
+                switch (typeWord)
+                {
+                    case "ERR":
+                        return MessageType.ERR;
+                    case "REPLY":
+                        return MessageType.REPLY;
+                    case "AUTH":
+                        return MessageType.AUTH;
+                    case "JOIN":
+                        return MessageType.JOIN;
+                    case "MSG":
+                        return MessageType.MSG;
+                    case "BYE":
+                        return MessageType.BYE;
+                    default:
+                        throw new ProtocolException("Invalid TCP message type detected", "[ERR|REPLY|AUTH|JOIN|MSG|BYE]", $"{typeWord}");
+                }
+            }
+        }
     }
 }
