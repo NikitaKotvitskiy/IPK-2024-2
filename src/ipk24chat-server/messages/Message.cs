@@ -1,5 +1,7 @@
 ﻿using ipk24chat_server.inner;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading.Channels;
 
 namespace ipk24chat_server.messages
 {
@@ -43,7 +45,9 @@ namespace ipk24chat_server.messages
             for (var i = startIndex; i < words.Length - 1; i++)
                 messageContent += words[i] + " ";
             messageContent += words[words.Length - 1];
-            // TODO: format checking
+
+            if (!FormatChecking.CheckMessageContent(messageContent))
+                throw new ProtocolException("Invalid format of TCP message content field detected", "max 1400 VCHAR symbols and spaces", messageContent);
 
             var fields = Fields;
             fields.MessageContent = messageContent;
@@ -52,7 +56,9 @@ namespace ipk24chat_server.messages
 
         protected void SetDisplayNameTcp(string displayName)
         {
-            // TODO: format checking
+            if (!FormatChecking.CheckDisplayName(displayName))
+                throw new ProtocolException("Invalid format of TCP display name field detected", "max 20 ALPHA, DIGIT, '-' and '.' symbols", displayName);
+
             var fields = Fields;
             fields.DisplayName = displayName;
             Fields = fields;
@@ -60,7 +66,9 @@ namespace ipk24chat_server.messages
 
         protected void SetChannelIdTcp(string channelId)
         {
-            // TODO: format checking
+            if (!FormatChecking.CheckChannelId(channelId))
+                throw new ProtocolException("Invalid format of TCP channel ID field detected", "max 20 ALPHA, DIGIT, '-' and '.' symbols", channelId);
+
             var fields = Fields;
             fields.ChannelId = channelId;
             Fields = fields;
@@ -68,7 +76,9 @@ namespace ipk24chat_server.messages
 
         protected void SetUsernameTcp(string username)
         {
-            // TODO: format checking
+            if (!FormatChecking.CheckUserName(username))
+                throw new ProtocolException("Invalid format of TCP username field detected", "max 20 ALPHA, DIGIT, '-' and '.' symbols", username);
+
             var fields = Fields;
             fields.Username = username;
             Fields = fields;
@@ -76,7 +86,9 @@ namespace ipk24chat_server.messages
 
         protected void SetSecretTcp(string secret)
         {
-            // TODO: format checking
+            if (!FormatChecking.CheckSecret(secret))
+                throw new ProtocolException("Invalid format of TCP secret field detected", "max 128 ALPHA, DIGIT, '-' and '.' symbols", secret);
+
             var fields = Fields;
             fields.Secret = secret;
             Fields = fields;
@@ -118,7 +130,10 @@ namespace ipk24chat_server.messages
         protected void SetDisplayNameUdp(ref int index)
         {
             var displayNameString = DecodeUdpString(ref index);
-            // TODO: format checking
+
+            if (!FormatChecking.CheckDisplayName(displayNameString))
+                throw new ProtocolException("Invalid format of UDP display name field detected", "max 20 ALPHA, DIGIT, '-' and '.' symbols", displayNameString);
+
             var fields = Fields;
             fields.DisplayName = displayNameString;
             Fields = fields;
@@ -127,7 +142,10 @@ namespace ipk24chat_server.messages
         protected void SetMessageContentUdp(ref int index)
         {
             var messageContent = DecodeUdpString(ref index);
-            // TODO: format checking
+
+            if (!FormatChecking.CheckMessageContent(messageContent))
+                throw new ProtocolException("Invalid format of UDP message content field detected", "max 1400 VCHAR symbols and spaces", messageContent);
+
             var fields = Fields;
             fields.MessageContent = messageContent;
             Fields = fields;
@@ -136,7 +154,10 @@ namespace ipk24chat_server.messages
         protected void SetChannelIdUdp(ref int index)
         {
             var channelIdString = DecodeUdpString(ref index);
-            // TODO: format checking
+
+            if (!FormatChecking.CheckChannelId(channelIdString))
+                throw new ProtocolException("Invalid format of UDP channel ID field detected", "max 20 ALPHA, DIGIT, '-' and '.' symbols", channelIdString);
+
             var fields = Fields;
             fields.ChannelId = channelIdString;
             Fields = fields;
@@ -145,7 +166,10 @@ namespace ipk24chat_server.messages
         protected void SetUsernameUdp(ref int index)
         {
             var usernameString = DecodeUdpString(ref index);
-            // TODO: format checking
+
+            if (!FormatChecking.CheckUserName(usernameString))
+                throw new ProtocolException("Invalid format of UDP username field detected", "max 20 ALPHA, DIGIT, '-' and '.' symbols", usernameString);
+
             var fields = Fields;
             fields.Username = usernameString;
             Fields = fields;
@@ -154,7 +178,10 @@ namespace ipk24chat_server.messages
         protected void SetSecretUdp(ref int index)
         {
             var secretString = DecodeUdpString(ref index);
-            // TODO: format checking
+
+            if (!FormatChecking.CheckSecret(secretString))
+                throw new ProtocolException("Invalid format of UDP secret field detected", "max 128 ALPHA, DIGIT, '-' and '.' symbols", secretString);
+
             var fields = Fields;
             fields.Secret = secretString;
             Fields = fields;
