@@ -20,10 +20,12 @@ namespace ipk24chat_server.messages
             else
             {
                 var messageString = Encoding.ASCII.GetString(Data);
-                var words = messageString.Split(' ');
 
-                SetChannelIdTcp(words[1]);
-                SetMessageContentTcp(words, 3);
+                var channelId = FindField(messageString, joinStr, asStr);
+                var displayName = FindField(messageString, asStr, endStr);
+
+                SetChannelIdTcp(channelId);
+                SetDisplayNameTcp(displayName);
             }
         }
 

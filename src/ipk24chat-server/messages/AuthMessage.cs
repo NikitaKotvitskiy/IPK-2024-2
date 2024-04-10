@@ -21,11 +21,14 @@ namespace ipk24chat_server.messages
             else
             {
                 var messageString = Encoding.ASCII.GetString(Data);
-                var words = messageString.Split(' ');
 
-                SetUsernameTcp(words[1]);
-                SetDisplayNameTcp(words[3]);
-                SetSecretTcp(words[5]);
+                var username = FindField(messageString, authStr, asStr);
+                var displayName = FindField(messageString, asStr, usingStr);
+                var secret = FindField(messageString, usingStr, endStr);
+
+                SetUsernameTcp(username);
+                SetDisplayNameTcp(displayName);
+                SetSecretTcp(secret);
             }
         }
 

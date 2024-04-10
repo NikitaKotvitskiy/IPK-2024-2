@@ -37,13 +37,8 @@ namespace ipk24chat_server.messages
             Data[Data.Length - 1] = (byte)'\n';
         }
 
-        protected void SetMessageContentTcp(string[] words, int startIndex)
+        protected void SetMessageContentTcp(string messageContent)
         {
-            var messageContent = string.Empty;
-            for (var i = startIndex; i < words.Length - 1; i++)
-                messageContent += words[i] + " ";
-            messageContent += words[words.Length - 1];
-
             if (!FormatChecking.CheckMessageContent(messageContent))
                 throw new ProtocolException("Invalid format of TCP message content field detected", "max 1400 VCHAR symbols and spaces", messageContent);
 
@@ -232,6 +227,26 @@ namespace ipk24chat_server.messages
                         throw new ProtocolException("Invalid TCP message type detected", "[ERR|REPLY|AUTH|JOIN|MSG|BYE]", $"{typeWord}");
                 }
             }
+        }
+
+        protected const string isStr = " IS ";
+        protected const string asStr = " AS ";
+        protected const string usingStr = " USING ";
+        protected const string joinStr = "JOIN ";
+        protected const string authStr = "AUTH ";
+        protected const string messageStr = "MSG FROM ";
+        protected const string errorStr = "ERR FROM ";
+        protected const string replyStr = "REPLY ";
+        protected const string byeStr = "BYE";
+        protected const string endStr = "\r\n";
+
+        protected string FindField(string message, string beforeField, string afterField)
+        {
+            var startIndex = message.IndexOf(beforeField) + beforeField.Length;
+            var endIndex = message.IndexOf(afterField);
+            if (startIndex >= 0 && endIndex >= 0)
+                return message.Substring(startIndex, endIndex - startIndex);
+            throw new ProtocolException("Invalid TCP message format", $"... {beforeField} [field] {afterField} ...", "no such structure");
         }
     }
 }
