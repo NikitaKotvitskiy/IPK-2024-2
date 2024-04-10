@@ -36,7 +36,6 @@ namespace ipk24chat_server.messages
             if (Protocol == ProtocolType.UDP)
             {
                 var mesIdArr = BitConverter.GetBytes((ushort)Fields.MessageId!);
-                Array.Reverse(mesIdArr);
                 var displayNameArr = Encoding.ASCII.GetBytes(Fields.DisplayName!);
                 var messageContentArr = Encoding.ASCII.GetBytes(Fields.MessageContent!);
 
@@ -46,6 +45,7 @@ namespace ipk24chat_server.messages
                 Array.Copy(mesIdArr, 0, Data, index, mesIdArr.Length);
                 index += mesIdArr.Length;
                 Array.Copy(displayNameArr, 0, Data, index, displayNameArr.Length);
+                index += displayNameArr.Length;
                 Data[index++] = 0x00;
                 Array.Copy(messageContentArr, 0, Data, index, messageContentArr.Length);
                 index += messageContentArr.Length;

@@ -19,10 +19,8 @@ namespace ipk24chat_server.messages
             if (protocol == ProtocolType.UDP)
             {
                 var mesIdArr = BitConverter.GetBytes((ushort)Fields.MessageId!);
-                Array.Reverse(mesIdArr);
                 var resultByte = (byte)(Fields.Result! == true ? 1 : 0);
                 var refMesIdArr = BitConverter.GetBytes((ushort)Fields.MessageRefId!);
-                Array.Reverse(refMesIdArr);
                 var mesContentArr = Encoding.ASCII.GetBytes(Fields.MessageContent!);
 
                 Data = new byte[1 + mesIdArr.Length + 1 + refMesIdArr.Length + mesContentArr.Length + 1];

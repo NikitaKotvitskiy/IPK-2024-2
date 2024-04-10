@@ -24,7 +24,6 @@
             if (Protocol == ProtocolType.UDP)
             {
                 var mesIdArr = BitConverter.GetBytes((ushort)Fields.MessageId!);
-                Array.Reverse(mesIdArr);
                 Data = new byte[1 + mesIdArr.Length];
                 Data[0] = 0xFF;
                 Array.Copy(mesIdArr, 0, Data, 1, mesIdArr.Length);

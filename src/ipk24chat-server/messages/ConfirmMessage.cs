@@ -27,7 +27,6 @@ namespace ipk24chat_server.messages
             Fields = fields;
 
             var refMesIdArr = BitConverter.GetBytes((ushort)Fields.MessageRefId!);
-            Array.Reverse(refMesIdArr);
             Data = new byte[1 +  refMesIdArr.Length];
             Data[0] = 0x00;
             Array.Copy(refMesIdArr, 0, Data, 1, refMesIdArr.Length);

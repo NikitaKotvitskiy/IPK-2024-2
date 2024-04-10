@@ -104,8 +104,8 @@ namespace ipk24chat_server.messages
         protected void SetMessageId(ref int index)
         {
             var mesIdSection = new byte[2];
-            mesIdSection[1] = Data[index++];
-            mesIdSection[0] = Data[index++];
+            Array.Copy(Data, index, mesIdSection, 0, 2);
+            index += 2;
             var mesId = BitConverter.ToUInt16(mesIdSection);
 
             var fields = Fields;
@@ -116,8 +116,8 @@ namespace ipk24chat_server.messages
         protected void SetReferenceMessageId(ref int index)
         {
             var refMesIdSection = new byte[2];
-            refMesIdSection[1] = Data[index++];
-            refMesIdSection[0] = Data[index++];
+            Array.Copy(Data, index, refMesIdSection, 0, 2);
+            index += 2;
             var refMesId = BitConverter.ToUInt16(refMesIdSection);
 
             var fields = Fields;
