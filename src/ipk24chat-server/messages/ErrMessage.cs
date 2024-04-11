@@ -31,7 +31,7 @@ namespace ipk24chat_server.messages
 
         public override void EncodeMessage(MessageFields fields, ProtocolType protocol)
         {
-            TypeOfMessage = MessageType.MSG;
+            TypeOfMessage = MessageType.ERR;
             Protocol = protocol;
             Fields = fields;
 

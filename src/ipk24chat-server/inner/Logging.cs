@@ -96,7 +96,8 @@ namespace ipk24chat_server.inner
                     break;
             }
 
-            Console.WriteLine(logString);
+            logString += "\n";
+            Console.Write(logString);
         }
     }
 }
