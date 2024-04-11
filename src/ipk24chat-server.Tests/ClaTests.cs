@@ -9,7 +9,7 @@ namespace ipk24chat_server.Tests
     public class ClaTests
     {
         [Fact]
-        public void NoClaTest()
+        public void No_ClaTest()
         {
             // Arrange
             var args = new string[0];
@@ -27,7 +27,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void ValidIpClaTest()
+        public void Valid_Ip_ClaTest()
         {
             // Arrange
             var args = new string[] { "-l", "127.0.0.1" };
@@ -41,7 +41,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void ValidPortClaTest()
+        public void Valid_Port_ClaTest()
         {
             // Arrange
             var args = new string[] { "-p", "1234" };
@@ -55,7 +55,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void ValidUdpTimeoutClaTest()
+        public void Valid_UdpTimeout_ClaTest()
         {
             // Arrange
             var args = new string[] { "-d", "300" };
@@ -69,7 +69,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void ValidUdpRetransmissionsClaTest()
+        public void Valid_UdpRetransmissions_ClaTest()
         {
             // Arrange
             var args = new string[] { "-r", "5" };
@@ -83,7 +83,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void HelpClaTest()
+        public void Help_ClaTest()
         {
             // Arrange
             var args = new string[] { "-h" };
@@ -96,7 +96,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void AllValidClaTest()
+        public void AllValid_ClaTest()
         {
             // Arrange
             var args = new string[] { "-p", "5678", "-l", "25.25.25.25", "-r", "1", "-d", "500" };
@@ -113,7 +113,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void OneInvalidClaTest()
+        public void OneInvalid_ClaTest()
         {
             // Arrange
             var args = new string[] { "-p", "5678", "-l", "25.25.25.1000", "-r", "1", "-d", "500" };
@@ -126,7 +126,7 @@ namespace ipk24chat_server.Tests
         }
 
         [Fact]
-        public void AllValidButHelpClaTest()
+        public void AllValid_ButHelp_ClaTest()
         {
             // Arrange
             var args = new string[] { "-p", "5678", "-l", "25.25.25.25", "-r", "1", "-d", "500", "-h" };
