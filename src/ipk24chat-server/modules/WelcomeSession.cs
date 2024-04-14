@@ -1,12 +1,16 @@
 ﻿using ipk24chat_server.inner;
 using ipk24chat_server.messages;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ipk24chat_server.modules
 {
     public class WelcomeSession
     {
+        public static ConcurrentDictionary<string, bool> loggedUsers = new ConcurrentDictionary<string, bool>();
+
         private TcpListener tcpListener = null!;
         private UdpClient udpClient = null!;
 
@@ -70,9 +74,10 @@ namespace ipk24chat_server.modules
                 {
                     IPEndPoint? remoteEndPoint = null;
                     var receivedData = udpClient.Receive(ref remoteEndPoint);
-                    if (!ConfirmFirstUdpMessage(receivedData, remoteEndPoint))
+                    var firstMessage = ConfirmFirstUdpMessage(receivedData, remoteEndPoint);
+                    if (firstMessage == null)
                         continue;
-                    ThreadPool.QueueUserWorkItem(CreateNewUdpSession, (remoteEndPoint, receivedData));
+                    ThreadPool.QueueUserWorkItem(CreateNewUdpSession, (remoteEndPoint, firstMessage));
                 }
             }
             catch (Exception ex)
@@ -106,12 +111,12 @@ namespace ipk24chat_server.modules
 
         private void CreateNewUdpSession(Object? stateInfo)
         {
-            (IPEndPoint remoteEndPoint, byte[] data) = ((IPEndPoint, byte[]))stateInfo!;
+            (IPEndPoint remoteEndPoint, Message firstMessage) = ((IPEndPoint, Message))stateInfo!;
             var session = new UdpSession();
 
             try
             {
-                session.StartSession(remoteEndPoint, data);
+                session.StartSession(remoteEndPoint, firstMessage);
             }
             catch (Exception ex)
             {
@@ -148,16 +153,16 @@ namespace ipk24chat_server.modules
             Logging.LogMessage(remoteEndPoint.Address, (ushort)remoteEndPoint.Port, true, errMessage);
         }
 
-        private bool ConfirmFirstUdpMessage(byte[] data, IPEndPoint remoteEndPoint)
+        private Message? ConfirmFirstUdpMessage(byte[] data, IPEndPoint remoteEndPoint)
         {
             var recvMessage = Message.ConvertDataToMessage(data, Message.ProtocolType.UDP);
             if (recvMessage == null)
             {
                 GenerateUdpErrorMessage("Invalid message format!", remoteEndPoint);
-                return false;
+                return null;
             }
             if (recvMessage.TypeOfMessage == Message.MessageType.CONFIRM)
-                return false;
+                return null;
 
             Logging.LogMessage(remoteEndPoint.Address, (ushort)remoteEndPoint.Port, true, recvMessage);
 
@@ -170,12 +175,12 @@ namespace ipk24chat_server.modules
             {
                 udpClient.Send(confMessage.Data, confMessage.Data.Length, remoteEndPoint);
                 Logging.LogMessage(remoteEndPoint.Address, (ushort)remoteEndPoint.Port, false, confMessage);
-                return true;
+                return recvMessage;
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Failed to sent confirmation message to {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port}: {e.Message}");
-                return false;
+                return null;
             }
         }
     }
