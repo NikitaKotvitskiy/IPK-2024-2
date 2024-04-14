@@ -10,34 +10,75 @@ namespace ipk24chat_server.modules
         private TcpListener tcpListener = null!;
         private UdpClient udpClient = null!;
 
+        public SemaphoreSlim FinishSemaphore = new SemaphoreSlim(0, 1);
+
         public void StartWelcomeSession()
         {
-            tcpListener = new TcpListener(Cla.ListeningIp, Cla.ListeningPort);
-            udpClient = new UdpClient(Cla.ListeningPort, AddressFamily.InterNetwork);
+            try
+            {
+                tcpListener = new TcpListener(Cla.ListeningIp, Cla.ListeningPort);
+                tcpListener.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Creating TCP welcome listener failed: {ex.Message}");
+                return;
+            }
 
-            tcpListener.Start();
+            try
+            {
+                udpClient = new UdpClient(Cla.ListeningPort, AddressFamily.InterNetwork);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Creating UDP welcome client failed: {ex.Message}");
+                tcpListener.Stop();
+                return;
+            }
+
             ThreadPool.QueueUserWorkItem(ListenForTcpClients);
             ThreadPool.QueueUserWorkItem(ListenForUdpClients);
+
+            FinishSemaphore.Wait();
         }
 
         private void ListenForTcpClients(object? state)
         {
-            while (true)
+            Console.WriteLine("TCP welcome listener is started...");
+
+            try
             {
-                var tcpClient = tcpListener.AcceptTcpClient();
-                ThreadPool.QueueUserWorkItem(CreateNewTcpSession, tcpClient);
+                while (true)
+                {
+                    var tcpClient = tcpListener.AcceptTcpClient();
+                    ThreadPool.QueueUserWorkItem(CreateNewTcpSession, tcpClient);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Welcome TCP listener error: {ex.Message}");
+                FinishSemaphore.Release();
             }
         }
 
         private void ListenForUdpClients(object? state) 
         {
-            while (true)
+            Console.WriteLine("UDP welcome listener is started...");
+            try
             {
-                IPEndPoint? remoteEndPoint = null;
-                var receivedData = udpClient.Receive(ref remoteEndPoint);
-                if (!ConfirmFirstUdpMessage(receivedData, remoteEndPoint))
-                    continue;
-                ThreadPool.QueueUserWorkItem(CreateNewUdpSession, (remoteEndPoint, receivedData));
+                while (true)
+                {
+                    IPEndPoint? remoteEndPoint = null;
+                    var receivedData = udpClient.Receive(ref remoteEndPoint);
+                    if (!ConfirmFirstUdpMessage(receivedData, remoteEndPoint))
+                        continue;
+                    ThreadPool.QueueUserWorkItem(CreateNewUdpSession, (remoteEndPoint, receivedData));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Welcome UDP listener error: {ex.Message}");
+                FinishSemaphore.Release();
             }
 
         }
@@ -46,14 +87,41 @@ namespace ipk24chat_server.modules
         {
             var tcpClient = (TcpClient)stateInfo!;
             var session = new TcpSession();
-            session.StartSession(tcpClient);
+            var remoteEndPoint = (tcpClient.Client.RemoteEndPoint as IPEndPoint)!;
+
+            try
+            {
+                session.StartSession(tcpClient);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Problem with TCP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port}: {ex.Message}");
+            }
+            finally
+            {
+                session.StopSession();
+                Console.WriteLine($"TCP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port} has been closed");
+            }
         }
 
         private void CreateNewUdpSession(Object? stateInfo)
         {
             (IPEndPoint remoteEndPoint, byte[] data) = ((IPEndPoint, byte[]))stateInfo!;
             var session = new UdpSession();
-            session.StartSession(remoteEndPoint, data);
+
+            try
+            {
+                session.StartSession(remoteEndPoint, data);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Problem with UDP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port}: {ex.Message}");
+            }
+            finally
+            {
+                session.StopSession();
+                Console.WriteLine($"UDP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port} has been closed");
+            }
         }
 
 
@@ -67,66 +135,48 @@ namespace ipk24chat_server.modules
             var errMessage = new ErrMessage();
             errMessage.EncodeMessage(fields, Message.ProtocolType.UDP);
 
-            udpClient.Send(errMessage.Data, errMessage.Data.Length, remoteEndPoint);
-        }
-
-        private Message? ConvertDataIntoMessage(byte[] data, IPEndPoint remoteEndPoint)
-        {
-            Message? retValue = null;
             try
             {
-                var messageType = Message.DefineTypeOfMessage(data, Message.ProtocolType.UDP);
-                switch (messageType)
-                {
-                    case Message.MessageType.ERR:
-                        retValue = new ErrMessage();
-                        retValue.DecodeMessage(data, Message.ProtocolType.UDP);
-                        break;
-                    case Message.MessageType.CONFIRM:
-                        return null;
-                    case Message.MessageType.REPLY:
-                        retValue = new ReplyMessage();
-                        retValue.DecodeMessage(data, Message.ProtocolType.UDP);
-                        break;
-                    case Message.MessageType.AUTH:
-                        retValue = new AuthMessage();
-                        retValue.DecodeMessage(data, Message.ProtocolType.UDP);
-                        break;
-                    case Message.MessageType.JOIN:
-                        retValue = new JoinMessage();
-                        retValue.DecodeMessage(data, Message.ProtocolType.UDP);
-                        break;
-                    case Message.MessageType.MSG:
-                        retValue = new MsgMessage();
-                        retValue.DecodeMessage(data, Message.ProtocolType.UDP);
-                        break;
-                    case Message.MessageType.BYE:
-                        retValue = new ByeMessage();
-                        retValue.DecodeMessage(data, Message.ProtocolType.UDP);
-                        break;
-                }         
+                udpClient.Send(errMessage.Data, errMessage.Data.Length, remoteEndPoint);
             }
-            catch (ProtocolException pex)
+            catch (Exception e) 
             {
-                GenerateUdpErrorMessage(pex.Message, remoteEndPoint);
-                retValue = null;
+                Console.WriteLine($"Error! Failed to send error message to {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port}: {e.Message}");
+                return;
             }
 
-            return retValue;
+            Logging.LogMessage(remoteEndPoint.Address, (ushort)remoteEndPoint.Port, true, errMessage);
         }
+
         private bool ConfirmFirstUdpMessage(byte[] data, IPEndPoint remoteEndPoint)
         {
-            var recvMessage = ConvertDataIntoMessage(data, remoteEndPoint);
-            if (recvMessage == null) return false;
+            var recvMessage = Message.ConvertDataToMessage(data, Message.ProtocolType.UDP);
+            if (recvMessage == null)
+            {
+                GenerateUdpErrorMessage("Invalid message format!", remoteEndPoint);
+                return false;
+            }
+            if (recvMessage.TypeOfMessage == Message.MessageType.CONFIRM)
+                return false;
+
+            Logging.LogMessage(remoteEndPoint.Address, (ushort)remoteEndPoint.Port, true, recvMessage);
 
             var fields = new Message.MessageFields();
             fields.MessageRefId = recvMessage.Fields.MessageId;
             var confMessage = new ConfirmMessage();
             confMessage.EncodeMessage(fields, Message.ProtocolType.UDP);
 
-            udpClient.Send(confMessage.Data, confMessage.Data.Length, remoteEndPoint);
-
-            return true;
+            try
+            {
+                udpClient.Send(confMessage.Data, confMessage.Data.Length, remoteEndPoint);
+                Logging.LogMessage(remoteEndPoint.Address, (ushort)remoteEndPoint.Port, false, confMessage);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Failed to sent confirmation message to {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port}: {e.Message}");
+                return false;
+            }
         }
     }
 }

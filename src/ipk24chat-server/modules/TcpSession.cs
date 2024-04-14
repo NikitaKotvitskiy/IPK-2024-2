@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ipk24chat_server.modules
 {
@@ -13,7 +11,7 @@ namespace ipk24chat_server.modules
     {
         public void StartSession(TcpClient client)
         {
-            
+            throw new NotImplementedException();
         }
 
         public Message DecodeMessage(byte[] data)
