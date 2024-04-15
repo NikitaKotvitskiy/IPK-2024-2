@@ -77,7 +77,8 @@ namespace ipk24chat_server.modules
                     var firstMessage = ConfirmFirstUdpMessage(receivedData, remoteEndPoint);
                     if (firstMessage == null)
                         continue;
-                    ThreadPool.QueueUserWorkItem(CreateNewUdpSession, (remoteEndPoint, firstMessage));
+                    var newUdpSession = new UdpSession(remoteEndPoint);
+                    newUdpSession.StartSession(firstMessage);
                 }
             }
             catch (Exception ex)
@@ -85,7 +86,6 @@ namespace ipk24chat_server.modules
                 Console.WriteLine($"Welcome UDP listener error: {ex.Message}");
                 FinishSemaphore.Release();
             }
-
         }
 
         private void CreateNewTcpSession(Object? stateInfo)
@@ -108,27 +108,6 @@ namespace ipk24chat_server.modules
                 Console.WriteLine($"TCP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port} has been closed");
             }
         }
-
-        private void CreateNewUdpSession(Object? stateInfo)
-        {
-            (IPEndPoint remoteEndPoint, Message firstMessage) = ((IPEndPoint, Message))stateInfo!;
-            var session = new UdpSession();
-
-            try
-            {
-                session.StartSession(remoteEndPoint, firstMessage);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Problem with UDP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port}: {ex.Message}");
-            }
-            finally
-            {
-                session.StopSession();
-                Console.WriteLine($"UDP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port} has been closed");
-            }
-        }
-
 
         private void GenerateUdpErrorMessage(string messageContent, IPEndPoint remoteEndPoint)
         {
@@ -156,12 +135,7 @@ namespace ipk24chat_server.modules
         private Message? ConfirmFirstUdpMessage(byte[] data, IPEndPoint remoteEndPoint)
         {
             var recvMessage = Message.ConvertDataToMessage(data, Message.ProtocolType.UDP);
-            if (recvMessage == null)
-            {
-                GenerateUdpErrorMessage("Invalid message format!", remoteEndPoint);
-                return null;
-            }
-            if (recvMessage.TypeOfMessage == Message.MessageType.CONFIRM)
+            if (recvMessage == null || recvMessage.TypeOfMessage != Message.MessageType.AUTH)
                 return null;
 
             Logging.LogMessage(remoteEndPoint.Address, (ushort)remoteEndPoint.Port, true, recvMessage);
