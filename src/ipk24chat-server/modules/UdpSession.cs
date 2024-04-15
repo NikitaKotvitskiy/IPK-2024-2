@@ -29,6 +29,9 @@ namespace ipk24chat_server.modules
         private TaskCompletionSource endSession = new TaskCompletionSource();
         private TaskCompletionSource<Exception> sessionError = new TaskCompletionSource<Exception>();
 
+        private ChannelUser channelUser = null!;
+        private Channel currentChannel = null!;
+
         public UdpSession(IPEndPoint remoteEndPoint)
         {
             client = new UdpClient(0, AddressFamily.InterNetwork);
@@ -50,10 +53,6 @@ namespace ipk24chat_server.modules
 
             try
             {
-                //
-                // TODO: connect to general channel
-                //
-
                 ThreadPool.QueueUserWorkItem(MessageReceiver);
 
                 var end = endSession.Task;
@@ -68,15 +67,11 @@ namespace ipk24chat_server.modules
                 if (result == error)
                     throw error.Result;
 
-                //
-                // TODO: leave current channel
-                //
+                currentChannel.LeaveUser(username).Wait();
             }
             catch (Exception ex)
             {
-                // 
-                // TODO: leave current channel
-                //
+                currentChannel.LeaveUser(username).Wait();
 
                 Console.WriteLine($"LOG | Problem with UDP user session {_ip.ToString()}:{_port}: {ex.Message}");
                 StopSession();
@@ -125,7 +120,8 @@ namespace ipk24chat_server.modules
                 return;
             }
 
-            Logging.LogMessage(_ip, _port, true, message);
+            if (needToConfirm)
+                Logging.LogMessage(_ip, _port, true, message);
 
             if (message.TypeOfMessage == Message.MessageType.CONFIRM)
             {
@@ -168,6 +164,10 @@ namespace ipk24chat_server.modules
                     else
                         WelcomeSession.loggedUsers[username] = true;
 
+                    channelUser = new ChannelUser(displayName, this);
+                    currentChannel = Channel.Channels["general"];
+                    currentChannel.NewUser(username, channelUser).Wait();
+
                     SendReplyMessage((ushort)message.Fields.MessageId!, "Authentication is successful. Welcome to the server!", true);
                     openState = true;
                     return;
@@ -182,13 +182,9 @@ namespace ipk24chat_server.modules
                     //
                     break;
                 case Message.MessageType.MSG:
-                    //
-                    // TODO: check new display name
-                    //
-
-                    //
-                    // TODO: send message to the channel
-                    //
+                    if (message.Fields.DisplayName != displayName)
+                        channelUser.UpdateDisplayName(displayName);
+                    currentChannel.NewMessage((MsgMessage)message, username).Wait();
                     break;
                 default:
                     SendErrorMessage("Unexpected type of message, session will be terminated");

@@ -11,6 +11,7 @@ namespace ipk24chat_server
             if (!Cla.ProcessCla(args))
                 Console.WriteLine(Cla.HelpMessage);
 
+            var generalChannel = new Channel("general", true);
             var welcomeSession = new WelcomeSession();
 
             Console.CancelKeyPress += delegate (object? sender, ConsoleCancelEventArgs e) // Delegate for right exit from application
