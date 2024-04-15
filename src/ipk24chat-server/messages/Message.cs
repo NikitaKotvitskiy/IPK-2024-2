@@ -221,7 +221,7 @@ namespace ipk24chat_server.messages
                         return MessageType.JOIN;
                     case "MSG":
                         return MessageType.MSG;
-                    case "BYE":
+                    case "BYE\r\n":
                         return MessageType.BYE;
                     default:
                         throw new ProtocolException("Invalid TCP message type detected", "[ERR|REPLY|AUTH|JOIN|MSG|BYE]", $"{typeWord}");
@@ -247,6 +247,36 @@ namespace ipk24chat_server.messages
             if (startIndex >= 0 && endIndex >= 0)
                 return message.Substring(startIndex, endIndex - startIndex);
             throw new ProtocolException("Invalid TCP message format", $"... {beforeField} [field] {afterField} ...", "no such structure");
+        }
+
+        public static Message? ConvertDataToMessage(byte[] data, ProtocolType type)
+        {
+            if (data == null) 
+                return null;
+
+            Message message = new MsgMessage();
+            MessageType messType;
+            try
+            {
+                messType = DefineTypeOfMessage(data, type);
+                switch (messType)
+                {
+                    case MessageType.ERR: message = new ErrMessage(); break;
+                    case MessageType.CONFIRM: message = new ConfirmMessage();break;
+                    case MessageType.REPLY: message = new ReplyMessage(); break;
+                    case MessageType.AUTH: message = new AuthMessage(); break;
+                    case MessageType.JOIN: message = new JoinMessage(); break;
+                    case MessageType.MSG: message = new MsgMessage(); break;
+                    case MessageType.BYE: message = new ByeMessage(); break;
+                }
+                message.DecodeMessage(data, type);
+            }
+            catch
+            {
+                return null;
+            }
+
+            return message;
         }
     }
 }
