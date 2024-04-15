@@ -177,13 +177,32 @@ namespace ipk24chat_server.modules
             switch (message.TypeOfMessage)
             {
                 case Message.MessageType.JOIN:
-                    //
-                    // TODO: join channel
-                    //
+                    if (message.Fields.DisplayName != displayName)
+                    {
+                        displayName = message.Fields.DisplayName!;
+                        channelUser.UpdateDisplayName(displayName);
+                    }
+
+                    var channelId = (string)message.Fields.ChannelId!;
+                    if (channelId == currentChannel.ChannelId)
+                    {
+                        SendReplyMessage((ushort)message.Fields.MessageId!, "You are already on this channel", false);
+                        break;
+                    }
+                    currentChannel.LeaveUser(username).Wait();
+                    Channel.Channels.TryGetValue(channelId, out var newChannel);
+                    if (newChannel == null)
+                        newChannel = new Channel(channelId, false);
+                    currentChannel = newChannel;
+                    currentChannel.NewUser(username, channelUser).Wait();
+                    SendReplyMessage((ushort)message.Fields.MessageId!, $"You has successfully joined \"{channelId}\" channel", true);
                     break;
                 case Message.MessageType.MSG:
                     if (message.Fields.DisplayName != displayName)
-                        channelUser.UpdateDisplayName(displayName);
+                    {
+                        displayName = (string)message.Fields.DisplayName!;
+                        currentChannel.UpdateUserName(username, displayName).Wait();
+                    }
                     currentChannel.NewMessage((MsgMessage)message, username).Wait();
                     break;
                 default:
