@@ -221,7 +221,7 @@ namespace ipk24chat_server.messages
                         return MessageType.JOIN;
                     case "MSG":
                         return MessageType.MSG;
-                    case "BYE":
+                    case "BYE\r\n":
                         return MessageType.BYE;
                     default:
                         throw new ProtocolException("Invalid TCP message type detected", "[ERR|REPLY|AUTH|JOIN|MSG|BYE]", $"{typeWord}");

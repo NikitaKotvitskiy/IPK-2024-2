@@ -100,7 +100,10 @@ namespace ipk24chat_server.modules
                         await user.Value.UserUdpSession.SendMessage(message);
                     }
                     else if (user.Value.UserTcpSession != null)
+                    {
+                        message.EncodeMessage(message.Fields, Message.ProtocolType.TCP);
                         await user.Value.UserTcpSession.SendMessage(message);
+                    }
                 }
         }
     }

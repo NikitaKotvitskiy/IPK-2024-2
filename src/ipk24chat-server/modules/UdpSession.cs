@@ -67,14 +67,15 @@ namespace ipk24chat_server.modules
                 if (result == error)
                     throw error.Result;
 
-                currentChannel.LeaveUser(username).Wait();
+                if (openState)
+                    currentChannel.LeaveUser(username).Wait();
             }
             catch (Exception ex)
             {
-                currentChannel.LeaveUser(username).Wait();
+                if (openState)
+                    currentChannel.LeaveUser(username).Wait();
 
                 Console.WriteLine($"LOG | Problem with UDP user session {_ip.ToString()}:{_port}: {ex.Message}");
-                StopSession();
             }
             finally
             {

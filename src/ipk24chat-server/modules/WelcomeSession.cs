@@ -91,21 +91,16 @@ namespace ipk24chat_server.modules
         private void CreateNewTcpSession(Object? stateInfo)
         {
             var tcpClient = (TcpClient)stateInfo!;
-            var session = new TcpSession();
             var remoteEndPoint = (tcpClient.Client.RemoteEndPoint as IPEndPoint)!;
 
             try
             {
-                session.StartSession(tcpClient);
+                var tcpSession = new TcpSession(tcpClient);
+                tcpSession.StartSession();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Problem with TCP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port}: {ex.Message}");
-            }
-            finally
-            {
-                session.StopSession();
-                Console.WriteLine($"TCP user session {remoteEndPoint.Address.ToString()}:{remoteEndPoint.Port} has been closed");
             }
         }
 
