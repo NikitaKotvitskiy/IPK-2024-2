@@ -1,10 +1,10 @@
 # Changelog
-## Version 2024-04-08
+## Version 2024-04-15
 
 ### Added
-* CLA processing
-* Test project
-* CLA tests
+* TCP user communication
+* UDP user communication
+* Chat channels
 
 ### Changed
 
@@ -16,4 +16,4 @@ Nothing
 
 ### Limitations
 
-Unlimited
+Server does not send BYE messages and does not end user sessions when closing
