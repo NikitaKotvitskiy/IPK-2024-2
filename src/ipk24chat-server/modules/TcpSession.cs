@@ -1,11 +1,7 @@
 ﻿using ipk24chat_server.inner;
 using ipk24chat_server.messages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace ipk24chat_server.modules
 {
