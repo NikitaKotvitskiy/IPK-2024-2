@@ -1,10 +1,11 @@
 # Changelog
-## Version 2024-04-15
+## Version 2024-04-17
 
 ### Added
 * TCP user communication
 * UDP user communication
 * Chat channels
+* Test results
 
 ### Changed
 
@@ -12,7 +13,7 @@ Nothing
 
 ### Removed
 
-Nothing
+* Temporary documentation
 
 ### Limitations
 
