@@ -16,4 +16,4 @@ Nothing
 
 ### Limitations
 
-Server does not send BYE messages and does not end user sessions when closing
+Server does not end user sessions when closing
