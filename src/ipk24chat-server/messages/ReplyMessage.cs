@@ -1,4 +1,12 @@
-﻿using System.Text;
+﻿/******************************************************************************
+ *  IPK-2024-2
+ *  ReplyMessage.cs
+ *  Authors:        Nikita Kotvitskiy (xkotvi01)
+ *  Description:    REPLY message enoding/decoding
+ *  Last change:    10.04.23
+ *****************************************************************************/
+
+using System.Text;
 
 namespace ipk24chat_server.messages
 {
@@ -12,11 +20,11 @@ namespace ipk24chat_server.messages
 
         public override void EncodeMessage(MessageFields fields, ProtocolType protocol)
         {
-            TypeOfMessage = MessageType.REPLY;
+            TypeOfMessage = MessageType.Reply;
             Protocol = protocol;
             Fields = fields;
 
-            if (protocol == ProtocolType.UDP)
+            if (protocol == ProtocolType.Udp)
             {
                 var mesIdArr = BitConverter.GetBytes((ushort)Fields.MessageId!);
                 var resultByte = (byte)(Fields.Result! == true ? 1 : 0);

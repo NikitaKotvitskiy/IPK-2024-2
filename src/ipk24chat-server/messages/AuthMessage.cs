@@ -1,4 +1,12 @@
-﻿using System.Text;
+﻿/******************************************************************************
+ *  IPK-2024-2
+ *  AuthMessage.cs
+ *  Authors:        Nikita Kotvitskiy (xkotvi01)
+ *  Description:    AUTH message decoding
+ *  Last change:    10.04.23
+ *****************************************************************************/
+
+using System.Text;
 
 namespace ipk24chat_server.messages
 {
@@ -6,11 +14,11 @@ namespace ipk24chat_server.messages
     {
         public override void DecodeMessage(byte[] data, ProtocolType protocol)
         {
-            TypeOfMessage = MessageType.AUTH;
+            TypeOfMessage = MessageType.Auth;
             Protocol = protocol;
             Data = data;
 
-            if (Protocol == ProtocolType.UDP)
+            if (Protocol == ProtocolType.Udp)
             {
                 var index = 1;
                 SetMessageId(ref index);
@@ -22,9 +30,9 @@ namespace ipk24chat_server.messages
             {
                 var messageString = Encoding.ASCII.GetString(Data);
 
-                var username = FindField(messageString, authStr, asStr);
-                var displayName = FindField(messageString, asStr, usingStr);
-                var secret = FindField(messageString, usingStr, endStr);
+                var username = FindField(messageString, AuthStr, AsStr);
+                var displayName = FindField(messageString, AsStr, UsingStr);
+                var secret = FindField(messageString, UsingStr, EndStr);
 
                 SetUsernameTcp(username);
                 SetDisplayNameTcp(displayName);
