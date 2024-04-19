@@ -1,4 +1,12 @@
-﻿using System.Text;
+﻿/******************************************************************************
+ *  IPK-2024-2
+ *  JoinMessage.cs
+ *  Authors:        Nikita Kotvitskiy (xkotvi01)
+ *  Description:    JOIN message decoding
+ *  Last change:    10.04.23
+ *****************************************************************************/
+
+using System.Text;
 
 namespace ipk24chat_server.messages
 {
@@ -6,11 +14,11 @@ namespace ipk24chat_server.messages
     {
         public override void DecodeMessage(byte[] data, ProtocolType protocol)
         {
-            TypeOfMessage = MessageType.JOIN;
+            TypeOfMessage = MessageType.Join;
             Data = data;
             Protocol = protocol;
 
-            if (Protocol == ProtocolType.UDP)
+            if (Protocol == ProtocolType.Udp)
             {
                 var index = 1;
                 SetMessageId(ref index);
@@ -21,8 +29,8 @@ namespace ipk24chat_server.messages
             {
                 var messageString = Encoding.ASCII.GetString(Data);
 
-                var channelId = FindField(messageString, joinStr, asStr);
-                var displayName = FindField(messageString, asStr, endStr);
+                var channelId = FindField(messageString, JoinStr, AsStr);
+                var displayName = FindField(messageString, AsStr, EndStr);
 
                 SetChannelIdTcp(channelId);
                 SetDisplayNameTcp(displayName);

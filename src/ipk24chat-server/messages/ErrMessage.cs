@@ -1,4 +1,12 @@
-﻿using System.Text;
+﻿/******************************************************************************
+ *  IPK-2024-2
+ *  ErrorMessage.cs
+ *  Authors:        Nikita Kotvitskiy (xkotvi01)
+ *  Description:    ERROR message encoding/decoding
+ *  Last change:    11.04.23
+ *****************************************************************************/
+
+using System.Text;
 
 namespace ipk24chat_server.messages
 {
@@ -6,11 +14,11 @@ namespace ipk24chat_server.messages
     {
         public override void DecodeMessage(byte[] data, ProtocolType protocol)
         {
-            TypeOfMessage = MessageType.ERR;
+            TypeOfMessage = MessageType.Err;
             Data = data;
             Protocol = protocol;
 
-            if (Protocol == ProtocolType.UDP)
+            if (Protocol == ProtocolType.Udp)
             {
                 var index = 1;
                 SetMessageId(ref index);
@@ -21,8 +29,8 @@ namespace ipk24chat_server.messages
             {
                 var messageString = Encoding.ASCII.GetString(Data);
 
-                var displayName = FindField(messageString, errorStr, isStr);
-                var messageContent = FindField(messageString, isStr, endStr);
+                var displayName = FindField(messageString, ErrorStr, IsStr);
+                var messageContent = FindField(messageString, IsStr, EndStr);
 
                 SetDisplayNameTcp(displayName);
                 SetMessageContentTcp(messageContent);
@@ -31,11 +39,11 @@ namespace ipk24chat_server.messages
 
         public override void EncodeMessage(MessageFields fields, ProtocolType protocol)
         {
-            TypeOfMessage = MessageType.ERR;
+            TypeOfMessage = MessageType.Err;
             Protocol = protocol;
             Fields = fields;
 
-            if (Protocol == ProtocolType.UDP)
+            if (Protocol == ProtocolType.Udp)
             {
                 var mesIdArr = BitConverter.GetBytes((ushort)Fields.MessageId!);
                 var displayNameArr = Encoding.ASCII.GetBytes(Fields.DisplayName!);

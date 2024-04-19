@@ -8,17 +8,17 @@ namespace ipk24chat_server.Tests
 {
     public class LoggingTests : IDisposable
     {
-        private readonly StringWriter consoleOutput = null!;
-        private readonly TextWriter originalOutput = null!;
+        private readonly StringWriter _consoleOutput;
+        private readonly TextWriter _originalOutput;
 
-        private readonly IPAddress Ip = IPAddress.Parse("123.123.123.123");
-        private readonly ushort Port = 1234;
+        private readonly IPAddress _ip = IPAddress.Parse("123.123.123.123");
+        private const ushort port = 1234;
 
         public LoggingTests()
         {
-            originalOutput = Console.Out;
-            consoleOutput = new StringWriter();
-            Console.SetOut(consoleOutput);
+            _originalOutput = Console.Out;
+            _consoleOutput = new StringWriter();
+            Console.SetOut(_consoleOutput);
         }
 
         [Fact]
@@ -31,14 +31,14 @@ namespace ipk24chat_server.Tests
                                     0x4E, 0x69, 0x6B, 0x69, 0x74, 0x61, 0x00,                       // Display name = Nikita
                                     0x71, 0x77, 0x65, 0x72, 0x74, 0x79, 0x31, 0x32, 0x33, 0x00 };   // Secret = qwerty123
             var message = new AuthMessage();
-            message.DecodeMessage(data, Message.ProtocolType.UDP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | AUTH MessageId=42 Username=xkotvi01 DisplayName=Nikita Secret=qwerty123\n";
+            message.DecodeMessage(data, Message.ProtocolType.Udp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | AUTH MessageId=42 Username=xkotvi01 DisplayName=Nikita Secret=qwerty123\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -48,14 +48,14 @@ namespace ipk24chat_server.Tests
             var messageString = "AUTH xkotvi01 AS Nikita USING qwerty123\r\n";
             var messageData = Encoding.ASCII.GetBytes(messageString);
             var message = new AuthMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.TCP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | AUTH Username=xkotvi01 DisplayName=Nikita Secret=qwerty123\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Tcp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | AUTH Username=xkotvi01 DisplayName=Nikita Secret=qwerty123\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -65,14 +65,14 @@ namespace ipk24chat_server.Tests
             var messageData = new byte[] {  0xFF,           // Message type = BYE
                                             0x2A, 0x00 };   // MessageID = 42
             var message = new ByeMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.UDP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | BYE MessageId=42\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Udp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | BYE MessageId=42\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -82,14 +82,14 @@ namespace ipk24chat_server.Tests
             var messageString = "BYE\r\n";
             var messageData = Encoding.ASCII.GetBytes(messageString);
             var message = new ByeMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.TCP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | BYE\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Tcp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | BYE\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -99,14 +99,14 @@ namespace ipk24chat_server.Tests
             var fields = new Message.MessageFields();
             fields.MessageId = 42;
             var message = new ByeMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.UDP);
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | BYE MessageId={fields.MessageId}\n";
+            message.EncodeMessage(fields, Message.ProtocolType.Udp);
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | BYE MessageId={fields.MessageId}\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString , consoleOutput.ToString());
+            Assert.Contains(expectedLogString , _consoleOutput.ToString());
         }
 
         [Fact]
@@ -114,14 +114,14 @@ namespace ipk24chat_server.Tests
         {
             // Arrange
             var message = new ByeMessage();
-            message.EncodeMessage(new Message.MessageFields(), Message.ProtocolType.TCP);
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | BYE\n";
+            message.EncodeMessage(new Message.MessageFields(), Message.ProtocolType.Tcp);
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | BYE\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -132,14 +132,14 @@ namespace ipk24chat_server.Tests
                                             0x2A, 0x00 };   // RefMessageId = 42
 
             var message = new ConfirmMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.UDP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | CONFIRM RefMessageId=42\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Udp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | CONFIRM RefMessageId=42\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -149,14 +149,14 @@ namespace ipk24chat_server.Tests
             var fields = new Message.MessageFields();
             fields.MessageRefId = 42;
             var message = new ConfirmMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.UDP);
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | CONFIRM RefMessageId=42\n";
+            message.EncodeMessage(fields, Message.ProtocolType.Udp);
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | CONFIRM RefMessageId=42\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -167,14 +167,14 @@ namespace ipk24chat_server.Tests
                                             0x55, 0x73, 0x65, 0x72, 0x00,                       // DisplayName = User
                                             0x4D, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x00 };   // MessageContent = Message
             var message = new ErrMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.UDP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | ERR MessageId=42 DisplayName=User MessageContent=Message\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Udp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | ERR MessageId=42 DisplayName=User MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -184,14 +184,14 @@ namespace ipk24chat_server.Tests
             var messageString = "ERR FROM User IS Message\r\n";
             var messageData = Encoding.ASCII.GetBytes(messageString);
             var message = new ErrMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.TCP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | ERR DisplayName=User MessageContent=Message\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Tcp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | ERR DisplayName=User MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -203,15 +203,15 @@ namespace ipk24chat_server.Tests
             fields.DisplayName = "Server";
             fields.MessageContent = "Message";
             var message = new ErrMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.UDP);
+            message.EncodeMessage(fields, Message.ProtocolType.Udp);
 
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | ERR MessageId=42 DisplayName=Server MessageContent=Message\n";
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | ERR MessageId=42 DisplayName=Server MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -222,14 +222,14 @@ namespace ipk24chat_server.Tests
             fields.DisplayName = "Server";
             fields.MessageContent = "Message";
             var message = new ErrMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.TCP);
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | ERR DisplayName=Server MessageContent=Message\n";
+            message.EncodeMessage(fields, Message.ProtocolType.Tcp);
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | ERR DisplayName=Server MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -241,14 +241,14 @@ namespace ipk24chat_server.Tests
                                             0x67, 0x65, 0x6E, 0x65, 0x72, 0x61, 0x6C, 0x00,     // ChannelID = general
                                             0x55, 0x73, 0x65, 0x72, 0x00 };                     // DisplayName = User
             var message = new JoinMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.UDP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | JOIN MessageId=42 ChannelId=general DisplayName=User\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Udp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | JOIN MessageId=42 ChannelId=general DisplayName=User\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -257,14 +257,14 @@ namespace ipk24chat_server.Tests
             var messageString = "JOIN general AS User\r\n";
             var messageData = Encoding.ASCII.GetBytes(messageString);
             var message = new JoinMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.TCP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | JOIN ChannelId=general DisplayName=User\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Tcp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | JOIN ChannelId=general DisplayName=User\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -275,14 +275,14 @@ namespace ipk24chat_server.Tests
                                             0x55, 0x73, 0x65, 0x72, 0x00,                       // DisplayName = User
                                             0x4D, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x00 };   // MessageContent = Message
             var message = new MsgMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.UDP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | MSG MessageId=42 DisplayName=User MessageContent=Message\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Udp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | MSG MessageId=42 DisplayName=User MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -292,14 +292,14 @@ namespace ipk24chat_server.Tests
             var messageString = "MSG FROM User IS Message\r\n";
             var messageData = Encoding.ASCII.GetBytes(messageString);
             var message = new MsgMessage();
-            message.DecodeMessage(messageData, Message.ProtocolType.TCP);
-            var expectedLogString = $"RECV {Ip.ToString()}:{Port} | MSG DisplayName=User MessageContent=Message\n";
+            message.DecodeMessage(messageData, Message.ProtocolType.Tcp);
+            var expectedLogString = $"RECV {_ip.ToString()}:{port} | MSG DisplayName=User MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, true, message);
+            Logging.LogMessage(_ip, port, true, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -311,15 +311,15 @@ namespace ipk24chat_server.Tests
             fields.DisplayName = "Server";
             fields.MessageContent = "Message";
             var message = new MsgMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.UDP);
+            message.EncodeMessage(fields, Message.ProtocolType.Udp);
 
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | MSG MessageId=42 DisplayName=Server MessageContent=Message\n";
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | MSG MessageId=42 DisplayName=Server MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -330,14 +330,14 @@ namespace ipk24chat_server.Tests
             fields.DisplayName = "Server";
             fields.MessageContent = "Message";
             var message = new MsgMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.TCP);
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | MSG DisplayName=Server MessageContent=Message\n";
+            message.EncodeMessage(fields, Message.ProtocolType.Tcp);
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | MSG DisplayName=Server MessageContent=Message\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -350,14 +350,14 @@ namespace ipk24chat_server.Tests
             fields.Result = true;
             fields.MessageContent = "Success";
             var message = new ReplyMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.UDP);
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | REPLY MessageId=42 RefMessageId=42 Result=True MessageContent=Success\n";
+            message.EncodeMessage(fields, Message.ProtocolType.Udp);
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | REPLY MessageId=42 RefMessageId=42 Result=True MessageContent=Success\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         [Fact]
@@ -368,20 +368,20 @@ namespace ipk24chat_server.Tests
             fields.Result = false;
             fields.MessageContent = "Denied";
             var message = new ReplyMessage();
-            message.EncodeMessage(fields, Message.ProtocolType.TCP);
-            var expectedLogString = $"SENT {Ip.ToString()}:{Port} | REPLY Result=False MessageContent=Denied\n";
+            message.EncodeMessage(fields, Message.ProtocolType.Tcp);
+            var expectedLogString = $"SENT {_ip.ToString()}:{port} | REPLY Result=False MessageContent=Denied\n";
 
             // Act
-            Logging.LogMessage(Ip, Port, false, message);
+            Logging.LogMessage(_ip, port, false, message);
 
             // Assert
-            Assert.Contains(expectedLogString, consoleOutput.ToString());
+            Assert.Contains(expectedLogString, _consoleOutput.ToString());
         }
 
         public void Dispose()
         {
-            Console.SetOut(originalOutput);
-            consoleOutput.Dispose();
+            Console.SetOut(_originalOutput);
+            _consoleOutput.Dispose();
         }
     }
 }

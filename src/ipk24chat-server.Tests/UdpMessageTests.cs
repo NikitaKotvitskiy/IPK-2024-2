@@ -22,11 +22,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpAuth = new AuthMessage();
-            udpAuth.DecodeMessage(data, Message.ProtocolType.UDP);
+            udpAuth.DecodeMessage(data, Message.ProtocolType.Udp);
 
             // Assert
-            Assert.Equal(Message.ProtocolType.UDP, udpAuth.Protocol);
-            Assert.Equal(Message.MessageType.AUTH, udpAuth.TypeOfMessage);
+            Assert.Equal(Message.ProtocolType.Udp, udpAuth.Protocol);
+            Assert.Equal(Message.MessageType.Auth, udpAuth.TypeOfMessage);
             Assert.Equal(data, udpAuth.Data);
             Assert.Equal((ushort?)messageId, udpAuth.Fields.MessageId);
             Assert.Equal(username, udpAuth.Fields.Username);
@@ -46,7 +46,7 @@ namespace ipk24chat_server.Tests
 
             // Act & Assert
             var udpAuth = new AuthMessage();
-            Assert.Throws<ProtocolException>(() => udpAuth.DecodeMessage(data, Message.ProtocolType.UDP));
+            Assert.Throws<ProtocolException>(() => udpAuth.DecodeMessage(data, Message.ProtocolType.Udp));
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace ipk24chat_server.Tests
 
             // Act & Assert
             var udpAuth = new AuthMessage();
-            Assert.Throws<ProtocolException>(() => udpAuth.DecodeMessage(data, Message.ProtocolType.UDP));
+            Assert.Throws<ProtocolException>(() => udpAuth.DecodeMessage(data, Message.ProtocolType.Udp));
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace ipk24chat_server.Tests
 
             // Act & Assert
             var udpAuth = new AuthMessage();
-            Assert.Throws<ProtocolException>(() => udpAuth.DecodeMessage(data, Message.ProtocolType.UDP));
+            Assert.Throws<ProtocolException>(() => udpAuth.DecodeMessage(data, Message.ProtocolType.Udp));
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpBye = new ByeMessage();
-            udpBye.EncodeMessage(fields, Message.ProtocolType.UDP);
+            udpBye.EncodeMessage(fields, Message.ProtocolType.Udp);
 
             // Assert
             Assert.Equal(data, udpBye.Data);
@@ -104,11 +104,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpBye = new ByeMessage();
-            udpBye.DecodeMessage(data, Message.ProtocolType.UDP);
+            udpBye.DecodeMessage(data, Message.ProtocolType.Udp);
 
             // Assert
-            Assert.Equal(Message.ProtocolType.UDP, udpBye.Protocol);
-            Assert.Equal(Message.MessageType.BYE, udpBye.TypeOfMessage);
+            Assert.Equal(Message.ProtocolType.Udp, udpBye.Protocol);
+            Assert.Equal(Message.MessageType.Bye, udpBye.TypeOfMessage);
             Assert.Equal((ushort)messageId, udpBye.Fields.MessageId);
         }
 
@@ -122,7 +122,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpConfirm = new ConfirmMessage();
-            udpConfirm.EncodeMessage(fields, Message.ProtocolType.UDP);
+            udpConfirm.EncodeMessage(fields, Message.ProtocolType.Udp);
 
             // Assert
             Assert.Equal(data, udpConfirm.Data);
@@ -137,11 +137,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpConfirm = new ConfirmMessage();
-            udpConfirm.DecodeMessage(data, Message.ProtocolType.UDP);
+            udpConfirm.DecodeMessage(data, Message.ProtocolType.Udp);
 
             // Assert
-            Assert.Equal(Message.ProtocolType.UDP, udpConfirm.Protocol);
-            Assert.Equal(Message.MessageType.CONFIRM, udpConfirm.TypeOfMessage);
+            Assert.Equal(Message.ProtocolType.Udp, udpConfirm.Protocol);
+            Assert.Equal(Message.MessageType.Confirm, udpConfirm.TypeOfMessage);
             Assert.Equal((ushort)refMesId, udpConfirm.Fields.MessageRefId);
         }
 
@@ -160,7 +160,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpErr = new ErrMessage();
-            udpErr.EncodeMessage(fields, Message.ProtocolType.UDP);
+            udpErr.EncodeMessage(fields, Message.ProtocolType.Udp);
 
             // Assert
             Assert.Equal(data, udpErr.Data);
@@ -180,11 +180,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpErr = new ErrMessage();
-            udpErr.DecodeMessage(data, Message.ProtocolType.UDP);
+            udpErr.DecodeMessage(data, Message.ProtocolType.Udp);
 
             // Assert
-            Assert.Equal(Message.ProtocolType.UDP, udpErr.Protocol);
-            Assert.Equal(Message.MessageType.ERR, udpErr.TypeOfMessage);
+            Assert.Equal(Message.ProtocolType.Udp, udpErr.Protocol);
+            Assert.Equal(Message.MessageType.Err, udpErr.TypeOfMessage);
             Assert.Equal((ushort)messageId, udpErr.Fields.MessageId);
             Assert.Equal(displayName, udpErr.Fields.DisplayName);
             Assert.Equal(messageContent, udpErr.Fields.MessageContent);
@@ -201,7 +201,7 @@ namespace ipk24chat_server.Tests
 
             // Act & Assert
             var udpErr = new ErrMessage();
-            Assert.Throws<ProtocolException>(() => udpErr.DecodeMessage(data, Message.ProtocolType.UDP));
+            Assert.Throws<ProtocolException>(() => udpErr.DecodeMessage(data, Message.ProtocolType.Udp));
         }
 
         [Fact]
@@ -218,11 +218,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpJoin = new JoinMessage();
-            udpJoin.DecodeMessage(data, Message.ProtocolType.UDP);
+            udpJoin.DecodeMessage(data, Message.ProtocolType.Udp);
 
             // Assert
-            Assert.Equal(Message.ProtocolType.UDP, udpJoin.Protocol);
-            Assert.Equal(Message.MessageType.JOIN, udpJoin.TypeOfMessage);
+            Assert.Equal(Message.ProtocolType.Udp, udpJoin.Protocol);
+            Assert.Equal(Message.MessageType.Join, udpJoin.TypeOfMessage);
             Assert.Equal((ushort)messageId, udpJoin.Fields.MessageId);
             Assert.Equal(channelId, udpJoin.Fields.ChannelId);
             Assert.Equal(displayName, udpJoin.Fields.DisplayName);
@@ -239,7 +239,7 @@ namespace ipk24chat_server.Tests
 
             // Act & Assert
             var udpJoin = new JoinMessage();
-            Assert.Throws<ProtocolException>(() => udpJoin.DecodeMessage(data, Message.ProtocolType.UDP));
+            Assert.Throws<ProtocolException>(() => udpJoin.DecodeMessage(data, Message.ProtocolType.Udp));
         }
 
         [Fact]
@@ -257,7 +257,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpMsg = new MsgMessage();
-            udpMsg.EncodeMessage(fields, Message.ProtocolType.UDP);
+            udpMsg.EncodeMessage(fields, Message.ProtocolType.Udp);
 
             // Assert
             Assert.Equal(data, udpMsg.Data);
@@ -277,11 +277,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpMsg = new MsgMessage();
-            udpMsg.DecodeMessage(data, Message.ProtocolType.UDP);
+            udpMsg.DecodeMessage(data, Message.ProtocolType.Udp);
 
             // Assert
-            Assert.Equal(Message.ProtocolType.UDP, udpMsg.Protocol);
-            Assert.Equal(Message.MessageType.MSG, udpMsg.TypeOfMessage);
+            Assert.Equal(Message.ProtocolType.Udp, udpMsg.Protocol);
+            Assert.Equal(Message.MessageType.Msg, udpMsg.TypeOfMessage);
             Assert.Equal((ushort)messageId, udpMsg.Fields.MessageId);
             Assert.Equal(displayName, udpMsg.Fields.DisplayName);
             Assert.Equal(messageContent, udpMsg.Fields.MessageContent);
@@ -304,7 +304,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpReply = new ReplyMessage();
-            udpReply.EncodeMessage(fields, Message.ProtocolType.UDP);
+            udpReply.EncodeMessage(fields, Message.ProtocolType.Udp);
 
             // Assert
             Assert.Equal(data, udpReply.Data);

@@ -1,4 +1,11 @@
-﻿using System.Collections.Generic;
+﻿/******************************************************************************
+ *  IPK-2024-2
+ *  Cla.cs
+ *  Authors:        Nikita Kotvitskiy (xkotvi01)
+ *  Description:    Command line arguments processing
+ *  Last change:    08.04.23
+ *****************************************************************************/
+
 using System.Net;
 
 namespace ipk24chat_server.inner
@@ -17,6 +24,9 @@ namespace ipk24chat_server.inner
                                             "\t-r [count] - sets maximum number of UDP retrasmissions (3 by default)\n" +
                                             "\t-h - writes this help message\n";
 
+        // Processes arguments from given string array
+        // If some argument has invalid format or "-h" argument is present, returns false
+        // If all arguments are valid, returns true
         public static bool ProcessCla(string[] args)
         {
             ToDefault();
@@ -52,7 +62,6 @@ namespace ipk24chat_server.inner
                             return false;
                         UdpMaxRetransmissions = newUdpMaxRetransmissions;
                         break;
-                    case "-h":
                     default:
                         return false;
                 }

@@ -12,7 +12,7 @@ namespace ipk24chat_server.Tests
         public void No_ClaTest()
         {
             // Arrange
-            var args = new string[0];
+            var args = Array.Empty<string>();
             var validIp = IPAddress.Parse("0.0.0.0");
 
             // Act
@@ -30,7 +30,7 @@ namespace ipk24chat_server.Tests
         public void Valid_Ip_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-l", "127.0.0.1" };
+            var args = new[] { "-l", "127.0.0.1" };
 
             // Act
             var result = Cla.ProcessCla(args);
@@ -44,7 +44,7 @@ namespace ipk24chat_server.Tests
         public void Valid_Port_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-p", "1234" };
+            var args = new[] { "-p", "1234" };
 
             // Act
             var result = Cla.ProcessCla(args);
@@ -58,7 +58,7 @@ namespace ipk24chat_server.Tests
         public void Valid_UdpTimeout_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-d", "300" };
+            var args = new[] { "-d", "300" };
 
             // Act
             var result = Cla.ProcessCla(args);
@@ -72,7 +72,7 @@ namespace ipk24chat_server.Tests
         public void Valid_UdpRetransmissions_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-r", "5" };
+            var args = new[] { "-r", "5" };
 
             // Act
             var result = Cla.ProcessCla(args);
@@ -86,7 +86,7 @@ namespace ipk24chat_server.Tests
         public void Help_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-h" };
+            var args = new[] { "-h" };
 
             // Act
             var result = Cla.ProcessCla(args);
@@ -99,7 +99,7 @@ namespace ipk24chat_server.Tests
         public void AllValid_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-p", "5678", "-l", "25.25.25.25", "-r", "1", "-d", "500" };
+            var args = new[] { "-p", "5678", "-l", "25.25.25.25", "-r", "1", "-d", "500" };
 
             // Act
             var result = Cla.ProcessCla(args);
@@ -116,7 +116,7 @@ namespace ipk24chat_server.Tests
         public void OneInvalid_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-p", "5678", "-l", "25.25.25.1000", "-r", "1", "-d", "500" };
+            var args = new[] { "-p", "5678", "-l", "25.25.25.1000", "-r", "1", "-d", "500" };
 
             // Act
             var result = Cla.ProcessCla(args);
@@ -129,7 +129,7 @@ namespace ipk24chat_server.Tests
         public void AllValid_ButHelp_ClaTest()
         {
             // Arrange
-            var args = new string[] { "-p", "5678", "-l", "25.25.25.25", "-r", "1", "-d", "500", "-h" };
+            var args = new[] { "-p", "5678", "-l", "25.25.25.25", "-r", "1", "-d", "500", "-h" };
 
             // Act
             var result = Cla.ProcessCla(args);

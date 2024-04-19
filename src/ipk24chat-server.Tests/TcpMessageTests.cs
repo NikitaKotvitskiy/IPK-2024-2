@@ -20,11 +20,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpAuth = new AuthMessage();
-            tcpAuth.DecodeMessage(data, Message.ProtocolType.TCP);
+            tcpAuth.DecodeMessage(data, Message.ProtocolType.Tcp);
 
             // Assert
-            Assert.Equal(Message.ProtocolType.TCP, tcpAuth.Protocol);
-            Assert.Equal(Message.MessageType.AUTH, tcpAuth.TypeOfMessage);
+            Assert.Equal(Message.ProtocolType.Tcp, tcpAuth.Protocol);
+            Assert.Equal(Message.MessageType.Auth, tcpAuth.TypeOfMessage);
             Assert.Equal(fields, tcpAuth.Fields);
         }
 
@@ -37,7 +37,7 @@ namespace ipk24chat_server.Tests
 
             // Act && Assert
             var tcpAuth = new AuthMessage();
-            Assert.Throws<ProtocolException>(() => tcpAuth.DecodeMessage(data, Message.ProtocolType.TCP));
+            Assert.Throws<ProtocolException>(() => tcpAuth.DecodeMessage(data, Message.ProtocolType.Tcp));
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace ipk24chat_server.Tests
 
             // Act && Assert
             var tcpAuth = new AuthMessage();
-            Assert.Throws<ProtocolException>(() => tcpAuth.DecodeMessage(data, Message.ProtocolType.TCP));
+            Assert.Throws<ProtocolException>(() => tcpAuth.DecodeMessage(data, Message.ProtocolType.Tcp));
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace ipk24chat_server.Tests
 
             // Act && Assert
             var tcpAuth = new AuthMessage();
-            Assert.Throws<ProtocolException>(() => tcpAuth.DecodeMessage(data, Message.ProtocolType.TCP));
+            Assert.Throws<ProtocolException>(() => tcpAuth.DecodeMessage(data, Message.ProtocolType.Tcp));
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpBye = new ByeMessage();
-            tcpBye.EncodeMessage(new Message.MessageFields(), Message.ProtocolType.TCP);
+            tcpBye.EncodeMessage(new Message.MessageFields(), Message.ProtocolType.Tcp);
 
             // Assert
             Assert.Equal(data, tcpBye.Data);
@@ -88,11 +88,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpBye = new ByeMessage();
-            tcpBye.DecodeMessage(data, Message.ProtocolType.TCP);
+            tcpBye.DecodeMessage(data, Message.ProtocolType.Tcp);
 
             // Assert
-            Assert.True(tcpBye.Protocol == Message.ProtocolType.TCP);
-            Assert.True(tcpBye.TypeOfMessage == Message.MessageType.BYE);
+            Assert.True(tcpBye.Protocol == Message.ProtocolType.Tcp);
+            Assert.True(tcpBye.TypeOfMessage == Message.MessageType.Bye);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpErr = new ErrMessage();
-            tcpErr.EncodeMessage(fields, Message.ProtocolType.TCP);
+            tcpErr.EncodeMessage(fields, Message.ProtocolType.Tcp);
 
             // Assert
             Assert.Equal(data, tcpErr.Data);
@@ -125,11 +125,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpErr = new ErrMessage();
-            tcpErr.DecodeMessage(data, Message.ProtocolType.TCP);
+            tcpErr.DecodeMessage(data, Message.ProtocolType.Tcp);
 
             // Assert
-            Assert.True(tcpErr.Protocol == Message.ProtocolType.TCP);
-            Assert.True(tcpErr.TypeOfMessage == Message.MessageType.ERR);
+            Assert.True(tcpErr.Protocol == Message.ProtocolType.Tcp);
+            Assert.True(tcpErr.TypeOfMessage == Message.MessageType.Err);
             Assert.Equal(fields, tcpErr.Fields);
         }
 
@@ -145,7 +145,7 @@ namespace ipk24chat_server.Tests
 
             // Act && Assert
             var tcpErr = new ErrMessage();
-            Assert.Throws<ProtocolException>(() => tcpErr.DecodeMessage(data, Message.ProtocolType.TCP));
+            Assert.Throws<ProtocolException>(() => tcpErr.DecodeMessage(data, Message.ProtocolType.Tcp));
         }
 
         [Fact]
@@ -160,11 +160,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var udpJoin = new JoinMessage();
-            udpJoin.DecodeMessage(data, Message.ProtocolType.TCP);
+            udpJoin.DecodeMessage(data, Message.ProtocolType.Tcp);
 
             // Assert
-            Assert.True(udpJoin.Protocol == Message.ProtocolType.TCP);
-            Assert.True(udpJoin.TypeOfMessage == Message.MessageType.JOIN);
+            Assert.True(udpJoin.Protocol == Message.ProtocolType.Tcp);
+            Assert.True(udpJoin.TypeOfMessage == Message.MessageType.Join);
             Assert.Equal(fields, udpJoin.Fields);
         }
 
@@ -180,7 +180,7 @@ namespace ipk24chat_server.Tests
 
             // Act & Assert
             var tcpJoin = new JoinMessage();
-            Assert.Throws<ProtocolException>(() => tcpJoin.DecodeMessage(data, Message.ProtocolType.TCP));
+            Assert.Throws<ProtocolException>(() => tcpJoin.DecodeMessage(data, Message.ProtocolType.Tcp));
         }
 
         [Fact]
@@ -195,7 +195,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpMsg = new MsgMessage();
-            tcpMsg.EncodeMessage(fields, Message.ProtocolType.TCP);
+            tcpMsg.EncodeMessage(fields, Message.ProtocolType.Tcp);
 
             // Assert
             Assert.Equal(data, tcpMsg.Data);
@@ -213,11 +213,11 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpMsg = new MsgMessage();
-            tcpMsg.DecodeMessage(data, Message.ProtocolType.TCP);
+            tcpMsg.DecodeMessage(data, Message.ProtocolType.Tcp);
 
             // Assert
-            Assert.True(tcpMsg.Protocol == Message.ProtocolType.TCP);
-            Assert.True(tcpMsg.TypeOfMessage == Message.MessageType.MSG);
+            Assert.True(tcpMsg.Protocol == Message.ProtocolType.Tcp);
+            Assert.True(tcpMsg.TypeOfMessage == Message.MessageType.Msg);
             Assert.Equal(fields, tcpMsg.Fields);
         }
 
@@ -232,7 +232,7 @@ namespace ipk24chat_server.Tests
 
             // Act
             var tcpReply = new ReplyMessage();
-            tcpReply.EncodeMessage(fields, Message.ProtocolType.TCP);
+            tcpReply.EncodeMessage(fields, Message.ProtocolType.Tcp);
 
             // Assert
             Assert.Equal(data, tcpReply.Data);

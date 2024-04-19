@@ -1,12 +1,24 @@
-﻿using ipk24chat_server.inner;
+﻿/******************************************************************************
+ *  IPK-2024-2
+ *  Message.cs
+ *  Authors:        Nikita Kotvitskiy (xkotvi01)
+ *  Description:    Abstract class with common attributes and methods for
+ *                  all types of IPK24-CHAT messages
+ *  Last change:    15.04.23
+ *****************************************************************************/
+
+using ipk24chat_server.inner;
 using System.Text;
 
 namespace ipk24chat_server.messages
 {
     public abstract class Message
     {
-        public enum ProtocolType { TCP, UDP }
-        public enum MessageType { ERR, CONFIRM, REPLY, AUTH, JOIN, MSG, BYE }
+        public enum ProtocolType { Tcp, Udp }
+        public enum MessageType { Err, Confirm, Reply, Auth, Join, Msg, Bye }
+        
+        // This structure is used for storing all possible data of message
+        // If some message does not contain some kind of data, it will be null
         public struct MessageFields
         {
             public ushort? MessageId;
@@ -21,22 +33,29 @@ namespace ipk24chat_server.messages
 
         public ProtocolType Protocol { get; protected set; }
         public MessageType TypeOfMessage { get; protected set; }
-        public MessageFields Fields { get; protected set; } = new MessageFields();
+        public MessageFields Fields { get; protected set; }
 
         public byte[] Data { get; protected set; } = null!;
-
+        
+        // This function is used for encoding messages from the server
+        // It takes prepared MessageField structure (with all data in it) and the type of protocol (TCP or UDP)
         public abstract void EncodeMessage(MessageFields fields, ProtocolType protocol);
+        
+        // This function is used for decoding input messages
+        // It takes data array and the type of protocol (TCP or UDP)
         public abstract void DecodeMessage(byte[] data, ProtocolType protocol);
 
+        // Translate ready TCP message string into byte array "Data"
         protected void EncodeTcpMessageStringToByteArr(string message)
         {
             var messageArr = Encoding.ASCII.GetBytes(message);
             Data = new byte[messageArr.Length + 2];
             Array.Copy(messageArr, Data, messageArr.Length);
-            Data[Data.Length - 2] = (byte)'\r';
-            Data[Data.Length - 1] = (byte)'\n';
+            Data[^2] = (byte)'\r';
+            Data[^1] = (byte)'\n';
         }
 
+        // Takes string with MessageContent value and writes it in MessageFields structure
         protected void SetMessageContentTcp(string messageContent)
         {
             if (!FormatChecking.CheckMessageContent(messageContent))
@@ -47,6 +66,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes string with DisplayName value and writes it in MessageFields structure
         protected void SetDisplayNameTcp(string displayName)
         {
             if (!FormatChecking.CheckDisplayName(displayName))
@@ -57,6 +77,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes string with ChannelID value and writes it in MessageFields structure
         protected void SetChannelIdTcp(string channelId)
         {
             if (!FormatChecking.CheckChannelId(channelId))
@@ -67,6 +88,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes string with Username value and writes it in MessageFields structure
         protected void SetUsernameTcp(string username)
         {
             if (!FormatChecking.CheckUserName(username))
@@ -77,6 +99,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes string with Secret value and writes it in MessageFields structure
         protected void SetSecretTcp(string secret)
         {
             if (!FormatChecking.CheckSecret(secret))
@@ -87,6 +110,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes the start index of string value in byte array with UDP message, finds its end and convert a subarray into a string
         private string DecodeUdpString(ref int index)
         {
             var startIndex = index;
@@ -96,6 +120,7 @@ namespace ipk24chat_server.messages
             return Encoding.ASCII.GetString(Data, startIndex, count);
         }
 
+        // Takes the index of the first byte of MessageID, decodes it, and writes it in MessageFields structure
         protected void SetMessageId(ref int index)
         {
             var mesIdSection = new byte[2];
@@ -108,6 +133,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes the index of the first byte of RefMessageID, decodes it, and writes it in MessageFields structure
         protected void SetReferenceMessageId(ref int index)
         {
             var refMesIdSection = new byte[2];
@@ -120,6 +146,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes the index of the first byte of DisplayName, decodes it, and writes it in MessageFields structure
         protected void SetDisplayNameUdp(ref int index)
         {
             var displayNameString = DecodeUdpString(ref index);
@@ -132,6 +159,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes the index of the first byte of MessageContent, decodes it, and writes it in MessageFields structure
         protected void SetMessageContentUdp(ref int index)
         {
             var messageContent = DecodeUdpString(ref index);
@@ -144,6 +172,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         } 
 
+        // Takes the index of the first byte of ChannelID, decodes it, and writes it in MessageFields structure
         protected void SetChannelIdUdp(ref int index)
         {
             var channelIdString = DecodeUdpString(ref index);
@@ -156,6 +185,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes the index of the first byte of Username, decodes it, and writes it in MessageFields structure
         protected void SetUsernameUdp(ref int index)
         {
             var usernameString = DecodeUdpString(ref index);
@@ -168,6 +198,7 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
+        // Takes the index of the first byte of Secret, decodes it, and writes it in MessageFields structure
         protected void SetSecretUdp(ref int index)
         {
             var secretString = DecodeUdpString(ref index);
@@ -180,94 +211,83 @@ namespace ipk24chat_server.messages
             Fields = fields;
         }
 
-        public static MessageType DefineTypeOfMessage(byte[] data, ProtocolType protocol)
+        // Defines the type of message stored in byte array by checking first byte (UDP) or first ASCII word (TCP)
+        private static MessageType DefineTypeOfMessage(byte[] data, ProtocolType protocol)
         {
-            if (protocol == ProtocolType.UDP)
+            if (protocol == ProtocolType.Udp)
             {
-                var typeByte = (byte)data[0];
-                switch (typeByte)
+                var typeByte = data[0];
+                return typeByte switch
                 {
-                    case 0x00:
-                        return MessageType.CONFIRM;
-                    case 0x01:
-                        return MessageType.REPLY;
-                    case 0x02:
-                        return MessageType.AUTH;
-                    case 0x03:
-                        return MessageType.JOIN;
-                    case 0x04:
-                        return MessageType.MSG;
-                    case 0xFE:
-                        return MessageType.ERR;
-                    case 0xFF:
-                        return MessageType.BYE;
-                    default:
-                        throw new ProtocolException("Invalid UDP message type detected", "[0x00-0x04 | 0xFE-0xFF]", $"0x{typeByte:X2}");
-                }
+                    0x00 => MessageType.Confirm,
+                    0x01 => MessageType.Reply,
+                    0x02 => MessageType.Auth,
+                    0x03 => MessageType.Join,
+                    0x04 => MessageType.Msg,
+                    0xFE => MessageType.Err,
+                    0xFF => MessageType.Bye,
+                    _ => throw new ProtocolException("Invalid UDP message type detected", "[0x00-0x04 | 0xFE-0xFF]",
+                        $"0x{typeByte:X2}")
+                };
             }
-            else
+
+            var messageString = Encoding.ASCII.GetString(data);
+            var typeWord = messageString.Split(' ')[0];
+            return typeWord switch
             {
-                var messageString = Encoding.ASCII.GetString(data);
-                var typeWord = messageString.Split(' ')[0];
-                switch (typeWord)
-                {
-                    case "ERR":
-                        return MessageType.ERR;
-                    case "REPLY":
-                        return MessageType.REPLY;
-                    case "AUTH":
-                        return MessageType.AUTH;
-                    case "JOIN":
-                        return MessageType.JOIN;
-                    case "MSG":
-                        return MessageType.MSG;
-                    case "BYE\r\n":
-                        return MessageType.BYE;
-                    default:
-                        throw new ProtocolException("Invalid TCP message type detected", "[ERR|REPLY|AUTH|JOIN|MSG|BYE]", $"{typeWord}");
-                }
-            }
+                "ERR" => MessageType.Err,
+                "REPLY" => MessageType.Reply,
+                "AUTH" => MessageType.Auth,
+                "JOIN" => MessageType.Join,
+                "MSG" => MessageType.Msg,
+                "BYE\r\n" => MessageType.Bye,
+                _ => throw new ProtocolException("Invalid TCP message type detected", "[ERR|REPLY|AUTH|JOIN|MSG|BYE]",
+                    $"{typeWord}")
+            };
         }
 
-        protected const string isStr = " IS ";
-        protected const string asStr = " AS ";
-        protected const string usingStr = " USING ";
-        protected const string joinStr = "JOIN ";
-        protected const string authStr = "AUTH ";
-        protected const string messageStr = "MSG FROM ";
-        protected const string errorStr = "ERR FROM ";
-        protected const string replyStr = "REPLY ";
-        protected const string byeStr = "BYE";
-        protected const string endStr = "\r\n";
+        // The following constant string are used for decoding TCP messages:
+        protected const string IsStr = " IS ";
+        protected const string AsStr = " AS ";
+        protected const string UsingStr = " USING ";
+        protected const string JoinStr = "JOIN ";
+        protected const string AuthStr = "AUTH ";
+        protected const string MessageStr = "MSG FROM ";
+        protected const string ErrorStr = "ERR FROM ";
+        protected const string ReplyStr = "REPLY ";
+        protected const string ByeStr = "BYE";
+        protected const string EndStr = "\r\n";
 
+        // Takes a string with full TCP message, key word before the field, and key word just after the field
+        // Finds the string between two keywords and returns it
         protected string FindField(string message, string beforeField, string afterField)
         {
-            var startIndex = message.IndexOf(beforeField) + beforeField.Length;
-            var endIndex = message.IndexOf(afterField);
+            var startIndex = message.IndexOf(beforeField, StringComparison.Ordinal) + beforeField.Length;
+            var endIndex = message.IndexOf(afterField, StringComparison.Ordinal);
             if (startIndex >= 0 && endIndex >= 0)
                 return message.Substring(startIndex, endIndex - startIndex);
             throw new ProtocolException("Invalid TCP message format", $"... {beforeField} [field] {afterField} ...", "no such structure");
         }
 
+        // Takes a byte array and translates it into message due to specified protocol 
         public static Message? ConvertDataToMessage(byte[] data, ProtocolType type)
         {
-            if (data == null) 
+            if (data.Length == 0)
                 return null;
 
             Message message = new MsgMessage();
-            MessageType messType;
             try
             {
-                messType = DefineTypeOfMessage(data, type);
+                var messType = DefineTypeOfMessage(data, type);
                 switch (messType)
                 {
-                    case MessageType.ERR: message = new ErrMessage(); break;
-                    case MessageType.CONFIRM: message = new ConfirmMessage();break;
-                    case MessageType.REPLY: message = new ReplyMessage(); break;
-                    case MessageType.AUTH: message = new AuthMessage(); break;
-                    case MessageType.JOIN: message = new JoinMessage(); break;
-                    case MessageType.MSG: message = new MsgMessage(); break;
-                    case MessageType.BYE: message = new ByeMessage(); break;
+                    case MessageType.Err: message = new ErrMessage(); break;
+                    case MessageType.Confirm: message = new ConfirmMessage();break;
+                    case MessageType.Reply: message = new ReplyMessage(); break;
+                    case MessageType.Auth: message = new AuthMessage(); break;
+                    case MessageType.Join: message = new JoinMessage(); break;
+                    case MessageType.Msg: message = new MsgMessage(); break;
+                    case MessageType.Bye: message = new ByeMessage(); break;
                 }
                 message.DecodeMessage(data, type);
             }

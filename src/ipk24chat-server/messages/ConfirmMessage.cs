@@ -1,4 +1,12 @@
-﻿using ipk24chat_server.inner;
+﻿/******************************************************************************
+ *  IPK-2024-2
+ *  ConfirmMessage.cs
+ *  Authors:        Nikita Kotvitskiy (xkotvi01)
+ *  Description:    CONFIRM message encoding/decoding
+ *  Last change:    10.04.23
+ *****************************************************************************/
+
+using ipk24chat_server.inner;
 
 namespace ipk24chat_server.messages
 {
@@ -6,10 +14,10 @@ namespace ipk24chat_server.messages
     {
         public override void DecodeMessage(byte[] data, ProtocolType protocol)
         {
-            if (protocol == ProtocolType.TCP)
+            if (protocol == ProtocolType.Tcp)
                 throw new ProgramException("Trying to decode CONFIRM message in TCP protocol", "messages/ConfirmMessage.cs/DecodeMessage");
             
-            TypeOfMessage = MessageType.CONFIRM;
+            TypeOfMessage = MessageType.Confirm;
             Protocol = protocol;
             Data = data;
 
@@ -19,10 +27,10 @@ namespace ipk24chat_server.messages
 
         public override void EncodeMessage(MessageFields fields, ProtocolType protocol)
         {
-            if (protocol == ProtocolType.TCP)
+            if (protocol == ProtocolType.Tcp)
                 throw new ProgramException("Trying to encode CONFIRM message in TCP protocol", "messages/ConfirmMessage.cs/EncodeMessage");
             
-            TypeOfMessage = MessageType.CONFIRM;
+            TypeOfMessage = MessageType.Confirm;
             Protocol = protocol;
             Fields = fields;
 
