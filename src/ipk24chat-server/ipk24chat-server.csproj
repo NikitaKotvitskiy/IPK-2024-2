@@ -8,6 +8,7 @@
     <Nullable>enable</Nullable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>../../</OutputPath>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
 </Project>

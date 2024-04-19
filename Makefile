@@ -1,6 +1,6 @@
 PROJECT_NAME = ipk24chat-server
 
-PROJECT_FILE = ./src/$(ipk24chat-server)/$(PROJECT_NAME).csproj
+PROJECT_FILE = ./src/$(PROJECT_NAME)/$(PROJECT_NAME).csproj
 
 BUILD_FLAGS = --configuration Release
 
